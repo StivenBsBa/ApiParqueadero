@@ -2,6 +2,18 @@
 
 Esta API permite registrar, listar, actualizar y eliminar vehículos en un parqueadero. Los vehículos pueden ser de tipo "Carro" o "Moto". El parqueadero tiene un límite de 5 cupos para carros y 10 para motos.
 
+La API fue desarrollado utilizando **Node.js** y **Express** como servidor backend. La API permite gestionar vehículos, incluyendo su registro, consulta, actualización de estado, y eliminación.
+
+## Rutas de la API
+
+- **Ruta Base del Servidor**:  
+  `http://localhost:[puerto]/api/vehicles`  
+  Utiliza esta ruta base para interactuar con los endpoints de la API.
+
+- **Documentación de la API (Swagger)**:  
+  `http://localhost:[puerto]/api-docs`  
+  Visita esta URL para acceder a la documentación interactiva de la API. Aquí podrás ver todos los endpoints disponibles, cómo hacer solicitudes y qué respuestas esperar.
+
 ## Endpoints
 
 ### 1. **Registrar un vehículo**
@@ -95,7 +107,16 @@ Esta API permite registrar, listar, actualizar y eliminar vehículos en un parqu
   - **200 OK**: Total de horas de parqueo en el parqueadero.
   - **500 Internal Server Error**: Error al calcular el total de horas.
 
-### 9. **Actualizar el estado de salida de un vehículo**
+### 9. **Obtener las estadísticas de los vehículos**
+
+- **URL**: `/api/vehicles/stats`
+- **Método**: `GET`
+- **Descripción**: Obtiene las estadísticas de los vehículos en el parqueadero, incluyendo el total de vehículos, vehículos activos, vehículos inactivos, motos activas, motos inactivas, carros activos y carros inactivos.
+- **Respuestas**:
+  - **200 OK**: Se obtienen correctamente las estadísticas de los vehículos.
+  - **500 Internal Server Error**: Si ocurre un error al obtener las estadísticas de los vehículos.
+
+### 10. **Actualizar el estado de salida de un vehículo**
 
 - **URL**: `/api/vehicles/exit/:plate`
 - **Método**: `PUT`
@@ -108,7 +129,7 @@ Esta API permite registrar, listar, actualizar y eliminar vehículos en un parqu
   - **404 Not Found**: Vehículo no encontrado.
   - **500 Internal Server Error**: Error al actualizar el estado.
 
-### 10. **Registrar la reentrada de un vehículo**
+### 11. **Registrar la reentrada de un vehículo**
 
 - **URL**: `/api/vehicles/reenter/:plate`
 - **Método**: `PUT`
@@ -121,7 +142,7 @@ Esta API permite registrar, listar, actualizar y eliminar vehículos en un parqu
   - **404 Not Found**: Vehículo no encontrado.
   - **500 Internal Server Error**: Error al procesar la reentrada del vehículo.
 
-### 11. **Eliminar un vehículo**
+### 12. **Eliminar un vehículo**
 
 - **URL**: `/api/vehicles/delete/:plate`
 - **Método**: `DELETE`

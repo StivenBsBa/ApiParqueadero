@@ -1,7 +1,68 @@
 import VehicleModel from "../models/vehicleModels.js";
 import { ResponseMessages } from "../constants/responseMessages.js";
-import validateAndFormatPlate from "./validateAndFormatPlate.js";
+import validateAndFormatPlate from "../constants/validateAndFormatPlate.js";
 
+// Función para obtener las estadísticas de los vehículos
+export const getVehicleStats = async (req, res) => {
+  try {
+    // Total de vehículos
+    const totalVehicles = await VehicleModel.countDocuments();
+
+    // Total de vehículos activos
+    const totalActiveVehicles = await VehicleModel.countDocuments({
+      status: "active",
+    });
+
+    // Total de vehículos inactivos
+    const totalInactiveVehicles = await VehicleModel.countDocuments({
+      status: "inactive",
+    });
+
+    // Total de motos activas
+    const totalActiveMotos = await VehicleModel.countDocuments({
+      vehicleType: "Moto",
+      status: "active",
+    });
+
+    // Total de motos inactivas
+    const totalInactiveMotos = await VehicleModel.countDocuments({
+      vehicleType: "Moto",
+      status: "inactive",
+    });
+
+    // Total de carros activos
+    const totalActiveCarros = await VehicleModel.countDocuments({
+      vehicleType: "Carro",
+      status: "active",
+    });
+
+    // Total de carros inactivos
+    const totalInactiveCarros = await VehicleModel.countDocuments({
+      vehicleType: "Carro",
+      status: "inactive",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Estadísticas de vehículos obtenidas correctamente.",
+      data: {
+        "total de Vehículos": totalVehicles,
+        "total de VehículosA ctivos": totalActiveVehicles,
+        "total de Vehículos Inactivos": totalInactiveVehicles,
+        "total de Motos Activas": totalActiveMotos,
+        "total de Motos Inactivas": totalInactiveMotos,
+        "total de Carros Activos": totalActiveCarros,
+        "total de Carros Inactivos": totalInactiveCarros,
+      },
+    });
+  } catch (error) {
+    return res.status(ResponseMessages.SERVER_ERROR.status).json({
+      ...ResponseMessages.SERVER_ERROR,
+    });
+  }
+};
+
+// Función para obtener un solo vehículo por placa
 export const oneVehicle = async (req, res) => {
   try {
     let { plate } = req.params;
@@ -38,6 +99,7 @@ export const oneVehicle = async (req, res) => {
   }
 };
 
+// Función para listar vehículos por estado (activo/inactivo)
 export const listVehiclesByStatus = async (req, res) => {
   try {
     const { status } = req.query;

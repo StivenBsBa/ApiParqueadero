@@ -1,6 +1,6 @@
 import VehicleModel from "../models/vehicleModels.js";
 import { ResponseMessages } from "../constants/responseMessages.js";
-import validateAndFormatPlate from "./validateAndFormatPlate.js";
+import validateAndFormatPlate from "../constants/validateAndFormatPlate.js";
 
 export const deleteVehicleRecord = async (req, res) => {
   try {

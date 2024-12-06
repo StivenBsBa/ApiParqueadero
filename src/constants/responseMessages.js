@@ -9,46 +9,61 @@ export const ResponseMessages = {
   VEHICLE_REGISTERED_SUCCESS: createResponseMessage(
     201,
     true,
-    "Vehículo registrado con éxito."
+    "El vehículo ha sido registrado exitosamente."
   ),
 
   VEHICLE_DELETED_SUCCESS: createResponseMessage(
     200,
     true,
-    "Vehículo eliminado con éxito."
+    "El vehículo ha sido eliminado exitosamente."
   ),
+
   VEHICLE_EXITED_SUCCESS: createResponseMessage(
     200,
     true,
-    "Vehículo ha salido correctamente."
+    "La salida del vehículo se ha registrado correctamente."
   ),
+
   VEHICLE_LIST_SUCCESS: createResponseMessage(
     200,
     true,
-    "Vehículos listados correctamente."
+    "Lista de vehículos obtenida con éxito."
   ),
 
+  // Mensajes de error
   VEHICLE_NOT_FOUND: createResponseMessage(
     404,
     false,
-    "Vehículo no encontrado."
+    "El vehículo solicitado no fue encontrado."
   ),
 
-  VEHICLE_ACTIVE: createResponseMessage(400, false, "El vehículo está activo."),
+  VEHICLE_ACTIVE: createResponseMessage(
+    400,
+    false,
+    "El vehículo ya está registrado como activo."
+  ),
+
   VEHICLE_INACTIVE: createResponseMessage(
     400,
     false,
-    "El vehículo está inactivo."
+    "El vehículo ya está registrado como inactivo."
   ),
 
   SERVER_ERROR: createResponseMessage(
     500,
     false,
-    "Error al procesar la solicitud. Intente nuevamente."
+    "Ha ocurrido un error en el servidor. Por favor, inténtelo de nuevo más tarde."
   ),
+
   INVALID_DATE_FORMAT: createResponseMessage(
     400,
     false,
-    "El formato de la fecha no es válido."
+    "El formato de la fecha proporcionada no es válido."
+  ),
+
+  VEHICLE_ALREADY_REGISTERED: createResponseMessage(
+    400,
+    false,
+    "El vehículo ya está registrado en el sistema."
   ),
 };

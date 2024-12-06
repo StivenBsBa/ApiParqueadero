@@ -1,6 +1,6 @@
 import VehicleModel from "../models/vehicleModels.js";
 import { ResponseMessages } from "../constants/responseMessages.js";
-import validateAndFormatPlate from "./validateAndFormatPlate.js";
+import validateAndFormatPlate from "../constants/validateAndFormatPlate.js";
 
 const CAR_LIMIT = 5; // Límite de carros
 const MOTORCYCLE_LIMIT = 10; // Límite de motos
@@ -52,7 +52,7 @@ export const vehicleEntry = async (req, res) => {
     if (!limits[vehicleType]) {
       return res.status(400).json({
         success: false,
-        message: "Tipo de vehículo inválido.",
+        message: "Tipo de vehículo inválido debe ser Carro o Moto.",
       });
     }
 
