@@ -29,7 +29,11 @@ export const ResponseMessages = {
     true,
     "Lista de vehículos obtenida con éxito."
   ),
-
+  LISTA_DUEÑO: createResponseMessage(
+    200,
+    true,
+    "Lista de vehículos DEL DUEÑO obtenida con éxito."
+  ),
   // Mensajes de error
   VEHICLE_NOT_FOUND: createResponseMessage(
     404,

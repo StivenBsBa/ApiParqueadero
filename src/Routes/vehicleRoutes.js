@@ -4,7 +4,8 @@ import { deleteVehicleRecord } from "../controllers/deleteVehicleRecord.js";
 import {
   listVehiclesByStatus,
   oneVehicle,
-  getVehicleStats, // Asegúrate de importar la nueva función
+  getVehicleStats,
+  oneCedula,
 } from "../controllers/allVehicles.js";
 import { updateVehicleExit } from "../controllers/updateVehicleExit.js";
 import {
@@ -12,22 +13,24 @@ import {
   getVehicleTotalHours,
   getTotalHours,
 } from "../controllers/totalParkingTime .js";
+import { validatePlate } from "../constants/validate.js";
 
 const router = express.Router();
 
 // Otras rutas existentes
 router.get("/list", listVehiclesByStatus);
-router.get("/oneVehicles/:plate", oneVehicle);
-router.get("/vehicle-hours/:plate", getVehicleTotalPlate);
+router.get("/oneVehicles/:plate", validatePlate, oneVehicle);
+router.get("/oneCedula/:Cedula", oneCedula);
+router.get("/vehicle-hours/:plate", validatePlate, getVehicleTotalPlate);
 router.get("/all-vehicles-hours", getVehicleTotalHours);
 router.get("/total-hours", getTotalHours);
 router.get("/stats", getVehicleStats);
 
-router.post("/vehicleEntry", vehicleEntry);
+router.post("/vehicleEntry", validatePlate, vehicleEntry);
 
-router.put("/reenter/:plate", reenterVehicle);
-router.put("/exit/:plate", updateVehicleExit);
+router.put("/reenter/:plate", validatePlate, reenterVehicle);
+router.put("/exit/:plate", validatePlate, updateVehicleExit);
 
-router.delete("/delete/:plate", deleteVehicleRecord);
+router.delete("/delete/:plate", validatePlate, deleteVehicleRecord);
 
 export default router;

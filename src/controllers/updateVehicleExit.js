@@ -1,77 +1,56 @@
-import VehicleModel from "../models/vehicleModels.js";
+import Models from "../models/vehicleModels.js";
 import { ResponseMessages } from "../constants/responseMessages.js";
+const { VehicleModel, DueñoModel } = Models;
 
 export const updateVehicleExit = async (req, res) => {
   try {
-    const { plate } = req.params;
+    const { formattedPlate } = req;
 
-    if (!plate) {
-      return res.status(400).json({
-        success: false,
-        message: "La placa es obligatoria",
-      });
-    }
-
-    const vehicle = await VehicleModel.findOne({ plate: plate.toUpperCase() });
+    // Buscar y validar el vehículo en una sola operación
+    const vehicle = await VehicleModel.findOne({ plate: formattedPlate });
 
     if (!vehicle) {
-      return res.status(ResponseMessages.VEHICLE_NOT_FOUND.status).json({
-        ...ResponseMessages.VEHICLE_NOT_FOUND,
-      });
+      return res
+        .status(ResponseMessages.VEHICLE_NOT_FOUND.status)
+        .json(ResponseMessages.VEHICLE_NOT_FOUND);
     }
-
-    // Verificar si el vehículo ya está inactivo
     if (vehicle.status === "inactive") {
       return res.status(400).json({
         success: false,
-        message: "El vehículo ya ha salido",
+        message: `El vehículo con placa ${formattedPlate} ya ha salido.`,
       });
     }
 
-    // Calcular el tiempo de parqueo
-    const entryTime = new Date(vehicle.entryTime);
+    // Calcular el tiempo de parqueo y aproximarlo hacia arriba
     const exitTime = new Date();
-    const timeDifference = exitTime - entryTime; // En milisegundos
+    const hoursSpent = Math.ceil(
+      (exitTime - new Date(vehicle.entryTime)) / (1000 * 60 * 60)
+    );
 
-    let hoursSpent = timeDifference / (1000 * 60 * 60); // Convertir a horas
+    // Actualizar campos del vehículo
+    Object.assign(vehicle, {
+      exitTime,
+      status: "inactive",
+      totalTime: (vehicle.totalTime || 0) + hoursSpent,
+    });
 
-    // Si el tiempo es menor a una hora, redondear a 1 hora
-    if (hoursSpent < 1) {
-      hoursSpent = 1;
-    } else {
-      hoursSpent = Math.ceil(hoursSpent); // Redondear hacia arriba
-    }
-
-    // Acumular el tiempo total de parqueo
-    vehicle.totalTime = (vehicle.totalTime || 0) + hoursSpent; // Sumar las horas al total acumulado
-
-    // Actualizar el vehículo con la hora de salida y el estado
-    vehicle.exitTime = exitTime;
-    vehicle.status = "inactive"; // Cambiar el estado a inactivo
-
-    // Guardar los cambios en el vehículo
     await vehicle.save();
 
-    res.status(ResponseMessages.VEHICLE_EXITED_SUCCESS.status).json({
-      ...ResponseMessages.VEHICLE_EXITED_SUCCESS,
-      vehicle: {
-        plate: vehicle.plate,
-        vehicleType: vehicle.vehicleType,
-        entryTime: vehicle.entryTime,
-        exitTime: vehicle.exitTime,
-        status: vehicle.status,
-      },
-      parkingTime: `El vehículo con placa ${
-        vehicle.plate
-      } estuvo ${hoursSpent} ${
+    // Responder con los detalles del vehículo actualizado
+    const totalTimeMessage = `${vehicle.totalTime} ${
+      vehicle.totalTime === 1 ? "hora" : "horas"
+    }`;
+    res.status(200).json({
+      success: true,
+      message: `El vehículo con placa ${vehicle.plate} estuvo ${hoursSpent} ${
         hoursSpent === 1 ? "hora" : "horas"
-      } en el parqueadero. El tiempo total acumulado es de ${
-        vehicle.totalTime
-      } ${vehicle.totalTime === 1 ? "hora" : "horas"}.`,
+      } en el parqueadero. El tiempo total acumulado es de ${totalTimeMessage}.`,
     });
   } catch (error) {
-    res.status(ResponseMessages.SERVER_ERROR.status).json({
-      ...ResponseMessages.SERVER_ERROR,
+    console.error("Error al actualizar la salida del vehículo:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al procesar la salida del vehículo.",
       error: error.message,
     });
   }

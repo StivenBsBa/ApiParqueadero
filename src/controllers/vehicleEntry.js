@@ -1,23 +1,15 @@
-import VehicleModel from "../models/vehicleModels.js";
+import Models from "../models/vehicleModels.js";
 import { ResponseMessages } from "../constants/responseMessages.js";
-import validateAndFormatPlate from "../constants/validateAndFormatPlate.js";
 
-const CAR_LIMIT = 5; // Límite de carros
-const MOTORCYCLE_LIMIT = 10; // Límite de motos
+const CAR_LIMIT = 10; // Límite de carros
+const MOTORCYCLE_LIMIT = 20; // Límite de motos
+const { VehicleModel, DueñoModel } = Models;
 
 export const vehicleEntry = async (req, res) => {
   try {
-    const { plate, vehicleType, entryTime, exitTime, status } = req.body;
-    // Validación de placa
-    let formattedPlate;
-    try {
-      formattedPlate = validateAndFormatPlate(plate);
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    const { vehicleType, entryTime, exitTime, status, Cedula, Nombre } =
+      req.body;
+    const { formattedPlate } = req;
 
     // Verificar si el vehículo ya está registrado
     const existingVehicle = await VehicleModel.findOne({
@@ -65,13 +57,22 @@ export const vehicleEntry = async (req, res) => {
       });
     }
 
+    // Crear el Dueño si no existe
+    let owner = await DueñoModel.findOne({ Cedula });
+    if (!owner) {
+      owner = await DueñoModel.create({ Cedula, Nombre });
+    }
+
     // Registrar el nuevo vehículo
     const newVehicle = await VehicleModel.create({
       plate: formattedPlate,
       vehicleType,
-      entryTime: entryTime || Date.now(),
-      exitTime: exitTime || null,
-      status: status || "active",
+      entryTime,
+      exitTime,
+      status,
+      Cedula,
+      Nombre,
+      owner: owner._id,
     });
 
     return res.status(ResponseMessages.VEHICLE_REGISTERED_SUCCESS.status).json({
@@ -89,18 +90,7 @@ export const vehicleEntry = async (req, res) => {
 
 export const reenterVehicle = async (req, res) => {
   try {
-    const { plate } = req.params;
-
-    // Validar y formatear la placa
-    let formattedPlate;
-    try {
-      formattedPlate = validateAndFormatPlate(plate); // Validación de placa
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
+    const { formattedPlate } = req;
 
     // Buscar el vehículo
     const vehicle = await VehicleModel.findOne({ plate: formattedPlate });
@@ -114,7 +104,7 @@ export const reenterVehicle = async (req, res) => {
     if (vehicle.status === "active") {
       return res.status(400).json({
         success: false,
-        message: "El vehículo ya está activo en el parqueadero.",
+        message: `El vehículo con placa ${vehicle.plate} de tipo ${vehicle.vehicleType} se encuentra en el parqueadero.`,
       });
     }
 

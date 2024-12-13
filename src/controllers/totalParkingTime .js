@@ -1,6 +1,6 @@
-import VehicleModel from "../models/vehicleModels.js";
+import Models from "../models/vehicleModels.js";
 import { ResponseMessages } from "../constants/responseMessages.js";
-import validateAndFormatPlate from "../constants/validateAndFormatPlate.js";
+const { VehicleModel, DueñoModel } = Models;
 
 const formatTotalTime = (totalTime) => {
   const totalTimeInHours = Math.floor(totalTime);
@@ -10,35 +10,18 @@ const formatTotalTime = (totalTime) => {
 // 1. Obtener las horas de parqueo de un vehículo específico
 export const getVehicleTotalPlate = async (req, res) => {
   try {
-    const { plate } = req.params;
+    const { formattedPlate } = req;
 
-    if (!plate) {
-      return res.status(400).json({
-        success: false,
-        message: "La placa es obligatoria",
-      });
-    }
-    // Validación de placa
-    let formattedPlate;
-    try {
-      formattedPlate = validateAndFormatPlate(plate);
-    } catch (error) {
-      return res.status(400).json({
-        success: false,
-        message: error.message,
-      });
-    }
-
-    const vehicle = await VehicleModel.findOne({ plate: formattedPlate });
+    // Verificar si el vehículo ya está registrado
+    const vehicle = await VehicleModel.findOne({
+      plate: formattedPlate,
+    });
 
     if (!vehicle) {
-      return res.status(404).json({
-        success: false,
-        message: "Vehículo no encontrado",
+      return res.status(ResponseMessages.VEHICLE_NOT_FOUND.status).json({
+        ...ResponseMessages.VEHICLE_NOT_FOUND,
       });
     }
-
-    const formattedTime = formatTotalTime(vehicle.totalTime || 0);
 
     res.status(200).json({
       success: true,
@@ -46,7 +29,7 @@ export const getVehicleTotalPlate = async (req, res) => {
       vehicle: {
         plate: vehicle.plate,
         vehicleType: vehicle.vehicleType,
-        totalTime: formattedTime,
+        totalTime: vehicle.totalTime,
       },
     });
   } catch (error) {

@@ -57,6 +57,25 @@
 
 /**
  * @swagger
+ * /api/vehicles/onecedula/{Cedula}:
+ *   get:
+ *     description: Obtener vehículos específico por la cedula
+ *     parameters:
+ *       - name: Cedula
+ *         in: path
+ *         required: true
+ *         description: Cedula del Dueño a buscar
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Dueño encontrado
+ *       404:
+ *         description: Dueño no encontrado
+ */
+
+/**
+ * @swagger
  * /api/vehicles/vehicle-hours/{plate}:
  *   get:
  *     description: Obtener el tiempo total de parqueo de un vehículo específico
